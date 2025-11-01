@@ -194,26 +194,34 @@ export function HomeContent() {
                   </p>
 
                   {/* Slots Summary */}
-                  <Card className="mb-6">
-                    <CardContent className="pt-6">
-                      <div className="grid grid-cols-3 gap-4">
-                        <div>
-                          <p className="text-sm text-muted-foreground">Total Slots</p>
-                          <p className="text-2xl font-bold">{selectedLocationData.totalSlots}</p>
+                  <div className="grid grid-cols-3 gap-4 mb-6">
+                    <Card>
+                      <CardContent className="pt-6">
+                        <div className="text-center">
+                          <p className="text-sm text-muted-foreground mb-1">Total Slots</p>
+                          <p className="text-3xl font-bold">{selectedLocationData.totalSlots}</p>
                         </div>
-                        <div>
-                          <p className="text-sm text-muted-foreground">Available</p>
-                          <p className="text-2xl font-bold text-secondary">{getAvailableSlots(selectedLocation)}</p>
+                      </CardContent>
+                    </Card>
+                    <Card>
+                      <CardContent className="pt-6">
+                        <div className="text-center">
+                          <p className="text-sm text-muted-foreground mb-1">Available</p>
+                          <p className="text-3xl font-bold text-secondary">{getAvailableSlots(selectedLocation)}</p>
                         </div>
-                        <div>
-                          <p className="text-sm text-muted-foreground">Occupied</p>
-                          <p className="text-2xl font-bold text-destructive">
+                      </CardContent>
+                    </Card>
+                    <Card>
+                      <CardContent className="pt-6">
+                        <div className="text-center">
+                          <p className="text-sm text-muted-foreground mb-1">Occupied</p>
+                          <p className="text-3xl font-bold text-destructive">
                             {selectedLocationData.totalSlots - getAvailableSlots(selectedLocation)}
                           </p>
                         </div>
-                      </div>
-                    </CardContent>
-                  </Card>
+                      </CardContent>
+                    </Card>
+                  </div>
 
                   {/* Parking Slots Grid */}
                   <ParkingSlotGrid slots={selectedSlots} locationName={selectedLocationData.name} />

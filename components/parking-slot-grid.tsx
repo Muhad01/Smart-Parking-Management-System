@@ -20,34 +20,6 @@ export function ParkingSlotGrid({ slots, locationName, onSlotSelect }: ParkingSl
 
   return (
     <div className="space-y-6">
-      {/* Statistics */}
-      <div className="grid grid-cols-3 gap-4">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-center">
-              <p className="text-sm text-muted-foreground mb-1">Total Slots</p>
-              <p className="text-3xl font-bold">{slots.length}</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-center">
-              <p className="text-sm text-muted-foreground mb-1">Available</p>
-              <p className="text-3xl font-bold text-secondary">{availableSlots}</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-center">
-              <p className="text-sm text-muted-foreground mb-1">Occupied</p>
-              <p className="text-3xl font-bold text-destructive">{occupiedSlots}</p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
       {/* Slot Grid */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">

@@ -46,13 +46,13 @@ export function AdminSlotManager({ locationId }: AdminSlotManagerProps) {
             <div className="text-2xl font-bold">{slots.length}</div>
             <div className="text-sm text-muted-foreground">Total Slots</div>
           </div>
-          <div className="p-4 bg-white dark:bg-gray-900 border-2 border-black dark:border-white rounded-lg text-center">
-            <div className="text-2xl font-bold text-foreground">{freeCount}</div>
-            <div className="text-sm text-muted-foreground">Free</div>
+          <div className="p-4 bg-green-400 rounded-lg text-center">
+            <div className="text-2xl font-bold text-black">{freeCount}</div>
+            <div className="text-sm text-black">Free</div>
           </div>
-          <div className="p-4 bg-black dark:bg-black border-2 border-black dark:border-white rounded-lg text-center">
-            <div className="text-2xl font-bold text-white">{occupiedCount}</div>
-            <div className="text-sm text-gray-300">Occupied</div>
+          <div className="p-4 bg-red-400 rounded-lg text-center">
+            <div className="text-2xl font-bold text-black">{occupiedCount}</div>
+            <div className="text-sm text-black">Occupied</div>
           </div>
         </div>
 
@@ -64,8 +64,8 @@ export function AdminSlotManager({ locationId }: AdminSlotManagerProps) {
                 onClick={() => toggleSlotStatus(slot.id)}
                 className={`aspect-square rounded-lg font-medium text-sm transition-all ${
                   slot.isOccupied
-                    ? "bg-black text-white hover:bg-gray-800"
-                    : "bg-white border-2 border-black text-black hover:bg-gray-100"
+                    ? "bg-red-400 text-black hover:bg-red-500"
+                    : "bg-green-400 text-black hover:bg-green-500"
                 }`}
               >
                 {slot.slotNumber}
@@ -77,9 +77,9 @@ export function AdminSlotManager({ locationId }: AdminSlotManagerProps) {
         <div className="p-4 bg-muted rounded-lg text-sm text-muted-foreground">
           <p className="font-medium mb-2">Instructions:</p>
             <ul className="list-disc list-inside space-y-1">
-              <li>Click on any slot to toggle between occupied (black) and free (white)</li>
+              <li>Click on any slot to toggle between occupied (red) and available (green)</li>
               <li>Use the summary cards to track overall parking availability</li>
-              <li>White slots are available for users to reserve</li>
+              <li>Green slots are available for users</li>
             </ul>
         </div>
       </CardContent>

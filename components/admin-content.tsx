@@ -446,15 +446,14 @@ export function AdminContent() {
                                 w-14 h-14 rounded-lg font-semibold text-xs
                                 flex items-center justify-center
                                 animate-slot-pop
+                                ${
+                                  slot.isOccupied
+                                    ? "bg-red-400 text-black"
+                                    : "bg-green-400 text-black"
+                                }
                               `}
                               style={{
                                 animationDelay: `${index * 20}ms`,
-                                backgroundColor: slot.isOccupied
-                                  ? "hsl(var(--color-destructive))"
-                                  : "hsl(var(--color-secondary))",
-                                color: slot.isOccupied
-                                  ? "hsl(var(--color-destructive-foreground))"
-                                  : "hsl(var(--color-secondary-foreground))",
                               }}
                             >
                               {slot.slotNumber}
@@ -466,11 +465,11 @@ export function AdminContent() {
                       {/* Legend */}
                       <div className="flex gap-6 mt-6 pt-4 border-t border-border text-sm">
                         <div className="flex items-center gap-2">
-                          <div className="w-6 h-6 bg-secondary rounded" />
+                          <div className="w-6 h-6 bg-green-400 rounded" />
                           <span>Available</span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <div className="w-6 h-6 bg-destructive rounded" />
+                          <div className="w-6 h-6 bg-red-400 rounded" />
                           <span>Occupied</span>
                         </div>
                       </div>
