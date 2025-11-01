@@ -35,11 +35,11 @@ export function ParkingGrid({ locationId, showFreeOnly }: ParkingGridProps) {
             <div className="text-sm text-muted-foreground">Total Slots</div>
           </div>
           <div>
-            <div className="text-2xl font-bold text-green-500">{freeCount}</div>
+            <div className="text-2xl font-bold text-foreground">{freeCount}</div>
             <div className="text-sm text-muted-foreground">Free</div>
           </div>
           <div>
-            <div className="text-2xl font-bold text-red-500">{occupiedCount}</div>
+            <div className="text-2xl font-bold text-foreground">{occupiedCount}</div>
             <div className="text-sm text-muted-foreground">Occupied</div>
           </div>
         </div>
@@ -53,10 +53,10 @@ export function ParkingGrid({ locationId, showFreeOnly }: ParkingGridProps) {
               onClick={() => setSelectedSlot(selectedSlot === slot.id ? null : slot.id)}
               className={`aspect-square rounded-lg font-medium text-sm transition-all ${
                 slot.isOccupied
-                  ? "bg-red-500 text-white cursor-not-allowed opacity-75"
+                  ? "bg-black text-white cursor-not-allowed opacity-90"
                   : selectedSlot === slot.id
                     ? "bg-primary text-white ring-2 ring-primary ring-offset-2"
-                    : "bg-green-500 text-white hover:bg-green-600"
+                    : "bg-white border-2 border-black text-black hover:bg-gray-100"
               }`}
             >
               {slot.slotNumber}
@@ -77,11 +77,11 @@ export function ParkingGrid({ locationId, showFreeOnly }: ParkingGridProps) {
 
       <div className="flex gap-2 text-sm">
         <div className="flex items-center gap-2">
-          <div className="w-4 h-4 bg-green-500 rounded" />
+          <div className="w-4 h-4 bg-white border-2 border-black rounded" />
           <span className="text-muted-foreground">Free</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-4 h-4 bg-red-500 rounded" />
+          <div className="w-4 h-4 bg-black rounded" />
           <span className="text-muted-foreground">Occupied</span>
         </div>
       </div>

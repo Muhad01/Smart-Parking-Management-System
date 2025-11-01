@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ParkingSlotGrid } from "@/components/parking-slot-grid"
 import type { ParkingLocation, ParkingSlot } from "@/lib/types"
-import { Search, LogOut, MapPin, Filter } from "lucide-react"
+import { Search, LogOut, MapPin } from "lucide-react"
 
 // Mock data
 const mockLocations: ParkingLocation[] = [
@@ -55,23 +55,16 @@ const mockSlots: { [key: string]: ParkingSlot[] } = {
 export function HomeContent() {
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedLocation, setSelectedLocation] = useState<string | null>(null)
-  const [showOnlyFreeSlots, setShowOnlyFreeSlots] = useState(false)
   const { user, logout } = useAuth()
   const router = useRouter()
 
   const filteredLocations = useMemo(() => {
-    let filtered = mockLocations.filter(
+    return mockLocations.filter(
       (loc) =>
         loc.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         loc.address.toLowerCase().includes(searchQuery.toLowerCase()),
     )
-
-    if (showOnlyFreeSlots) {
-      filtered = filtered.filter((loc) => getAvailableSlots(loc.id) > 0)
-    }
-
-    return filtered
-  }, [searchQuery, showOnlyFreeSlots])
+  }, [searchQuery])
 
   const getAvailableSlots = (locationId: string) => {
     const slots = mockSlots[locationId] || []
@@ -129,20 +122,6 @@ export function HomeContent() {
                     className="pl-10 py-2 h-12"
                   />
                 </div>
-
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => setShowOnlyFreeSlots(!showOnlyFreeSlots)}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-all ${
-                      showOnlyFreeSlots
-                        ? "bg-secondary text-secondary-foreground border-secondary"
-                        : "border-border bg-background text-foreground hover:bg-muted"
-                    }`}
-                  >
-                    <Filter className="w-4 h-4" />
-                    {showOnlyFreeSlots ? "Showing Free Slots Only" : "Show Free Slots Only"}
-                  </button>
-                </div>
               </div>
             </div>
 
@@ -193,11 +172,7 @@ export function HomeContent() {
                 })
               ) : (
                 <div className="col-span-full text-center py-12">
-                  <p className="text-muted-foreground">
-                    {showOnlyFreeSlots
-                      ? "No locations with free slots found."
-                      : "No locations found matching your search."}
-                  </p>
+                  <p className="text-muted-foreground">No locations found matching your search.</p>
                 </div>
               )}
             </div>

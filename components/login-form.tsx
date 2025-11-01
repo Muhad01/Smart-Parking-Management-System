@@ -127,7 +127,7 @@ export function LoginForm() {
               </div>
             )}
 
-            {error && <div className="text-red-500 text-sm">{error}</div>}
+            {error && <div className="text-foreground text-sm">{error}</div>}
 
             <Button type="submit" className="w-full">
               {mode === "login" ? "Sign In" : "Create Account"}

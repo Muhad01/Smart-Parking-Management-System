@@ -46,13 +46,13 @@ export function AdminSlotManager({ locationId }: AdminSlotManagerProps) {
             <div className="text-2xl font-bold">{slots.length}</div>
             <div className="text-sm text-muted-foreground">Total Slots</div>
           </div>
-          <div className="p-4 bg-green-50 dark:bg-green-950 rounded-lg text-center">
-            <div className="text-2xl font-bold text-green-600">{freeCount}</div>
-            <div className="text-sm text-green-700 dark:text-green-300">Free</div>
+          <div className="p-4 bg-white dark:bg-gray-900 border-2 border-black dark:border-white rounded-lg text-center">
+            <div className="text-2xl font-bold text-foreground">{freeCount}</div>
+            <div className="text-sm text-muted-foreground">Free</div>
           </div>
-          <div className="p-4 bg-red-50 dark:bg-red-950 rounded-lg text-center">
-            <div className="text-2xl font-bold text-red-600">{occupiedCount}</div>
-            <div className="text-sm text-red-700 dark:text-red-300">Occupied</div>
+          <div className="p-4 bg-black dark:bg-black border-2 border-black dark:border-white rounded-lg text-center">
+            <div className="text-2xl font-bold text-white">{occupiedCount}</div>
+            <div className="text-sm text-gray-300">Occupied</div>
           </div>
         </div>
 
@@ -64,8 +64,8 @@ export function AdminSlotManager({ locationId }: AdminSlotManagerProps) {
                 onClick={() => toggleSlotStatus(slot.id)}
                 className={`aspect-square rounded-lg font-medium text-sm transition-all ${
                   slot.isOccupied
-                    ? "bg-red-500 text-white hover:bg-red-600"
-                    : "bg-green-500 text-white hover:bg-green-600"
+                    ? "bg-black text-white hover:bg-gray-800"
+                    : "bg-white border-2 border-black text-black hover:bg-gray-100"
                 }`}
               >
                 {slot.slotNumber}
@@ -76,11 +76,11 @@ export function AdminSlotManager({ locationId }: AdminSlotManagerProps) {
 
         <div className="p-4 bg-muted rounded-lg text-sm text-muted-foreground">
           <p className="font-medium mb-2">Instructions:</p>
-          <ul className="list-disc list-inside space-y-1">
-            <li>Click on any slot to toggle between occupied (red) and free (green)</li>
-            <li>Use the summary cards to track overall parking availability</li>
-            <li>Green slots are available for users to reserve</li>
-          </ul>
+            <ul className="list-disc list-inside space-y-1">
+              <li>Click on any slot to toggle between occupied (black) and free (white)</li>
+              <li>Use the summary cards to track overall parking availability</li>
+              <li>White slots are available for users to reserve</li>
+            </ul>
         </div>
       </CardContent>
     </Card>

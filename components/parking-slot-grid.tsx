@@ -4,7 +4,6 @@ import { useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import type { ParkingSlot } from "@/lib/types"
-import { AlertCircle, CheckCircle2, Clock } from "lucide-react"
 
 interface ParkingSlotGridProps {
   slots: ParkingSlot[]
@@ -13,44 +12,16 @@ interface ParkingSlotGridProps {
 }
 
 export function ParkingSlotGrid({ slots, locationName, onSlotSelect }: ParkingSlotGridProps) {
-  const [selectedSlot, setSelectedSlot] = useState<string | null>(null)
-  const [hoveredSlot, setHoveredSlot] = useState<string | null>(null)
-  const [reservedSlots, setReservedSlots] = useState<Set<string>>(new Set())
-
+  const [showAvailableOnly, setShowAvailableOnly] = useState(false)
   const availableSlots = slots.filter((s) => !s.isOccupied).length
   const occupiedSlots = slots.filter((s) => s.isOccupied).length
-  const reservedCount = reservedSlots.size
-
-  const handleSlotClick = (slot: ParkingSlot) => {
-    if (slot.isOccupied) return
-
-    if (selectedSlot === slot.id) {
-      setSelectedSlot(null)
-    } else {
-      setSelectedSlot(slot.id)
-      onSlotSelect?.(slot)
-    }
-  }
-
-  const handleReserveSlot = () => {
-    if (selectedSlot) {
-      const newReserved = new Set(reservedSlots)
-      newReserved.add(selectedSlot)
-      setReservedSlots(newReserved)
-      setSelectedSlot(null)
-    }
-  }
-
-  const handleCancelReservation = (slotId: string) => {
-    const newReserved = new Set(reservedSlots)
-    newReserved.delete(slotId)
-    setReservedSlots(newReserved)
-  }
+  
+  const displayedSlots = showAvailableOnly ? slots.filter((s) => !s.isOccupied) : slots
 
   return (
     <div className="space-y-6">
       {/* Statistics */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-3 gap-4">
         <Card>
           <CardContent className="pt-6">
             <div className="text-center">
@@ -75,56 +46,43 @@ export function ParkingSlotGrid({ slots, locationName, onSlotSelect }: ParkingSl
             </div>
           </CardContent>
         </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-center">
-              <p className="text-sm text-muted-foreground mb-1">Reserved</p>
-              <p className="text-3xl font-bold text-accent">{reservedCount}</p>
-            </div>
-          </CardContent>
-        </Card>
       </div>
 
       {/* Slot Grid */}
       <Card>
-        <CardHeader>
-          <CardTitle>Parking Layout</CardTitle>
-          <CardDescription>Click on an available slot to select it, then reserve your spot</CardDescription>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+          <div>
+            <CardTitle>Parking Layout</CardTitle>
+            <CardDescription>View available and occupied parking slots</CardDescription>
+          </div>
+          <Button
+            variant="outline"
+            onClick={() => setShowAvailableOnly(!showAvailableOnly)}
+            className="ml-4"
+          >
+            {showAvailableOnly ? "Show All Slots" : "Available Slots"}
+          </Button>
         </CardHeader>
         <CardContent className="space-y-6">
           {/* Slot Grid */}
           <div className="bg-muted/30 p-8 rounded-lg">
             <div className="grid gap-2" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(60px, 1fr))" }}>
-              {slots.map((slot) => {
-                const isSelected = selectedSlot === slot.id
-                const isReserved = reservedSlots.has(slot.id)
-                const isHovered = hoveredSlot === slot.id
-
+              {displayedSlots.map((slot) => {
                 return (
                   <div key={slot.id} className="flex flex-col items-center gap-1">
-                    <button
-                      onClick={() => handleSlotClick(slot)}
-                      onMouseEnter={() => setHoveredSlot(slot.id)}
-                      onMouseLeave={() => setHoveredSlot(null)}
-                      disabled={slot.isOccupied}
+                    <div
                       className={`
                         w-14 h-14 rounded-lg font-semibold text-xs transition-all duration-200
-                        flex items-center justify-center cursor-pointer relative
+                        flex items-center justify-center relative
                         ${
                           slot.isOccupied
-                            ? "bg-destructive/40 text-destructive-foreground cursor-not-allowed opacity-60"
-                            : isReserved
-                              ? "bg-accent text-accent-foreground ring-2 ring-accent ring-offset-2 shadow-md"
-                              : isSelected
-                                ? "bg-primary text-primary-foreground ring-2 ring-primary ring-offset-2 shadow-lg scale-110"
-                                : "bg-secondary text-secondary-foreground hover:bg-secondary/90 hover:shadow-md"
+                            ? "bg-red-400 text-black"
+                            : "bg-green-400 text-black"
                         }
-                        ${isHovered && !slot.isOccupied && !isSelected && !isReserved ? "shadow-lg scale-105" : ""}
                       `}
                     >
                       {slot.slotNumber}
-                    </button>
-                    {isReserved && <Clock className="w-3 h-3 text-accent" />}
+                    </div>
                   </div>
                 )
               })}
@@ -132,74 +90,16 @@ export function ParkingSlotGrid({ slots, locationName, onSlotSelect }: ParkingSl
           </div>
 
           {/* Legend */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t border-border">
+          <div className="grid grid-cols-2 gap-4 pt-4 border-t border-border">
             <div className="flex items-center gap-2">
-              <div className="w-6 h-6 bg-secondary rounded" />
+              <div className="w-6 h-6 bg-green-400 rounded" />
               <span className="text-sm">Available</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-6 h-6 bg-primary rounded ring-2 ring-primary ring-offset-2" />
-              <span className="text-sm">Selected</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-6 h-6 bg-accent rounded" />
-              <span className="text-sm">Reserved</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-6 h-6 bg-destructive/40 rounded opacity-60" />
+              <div className="w-6 h-6 bg-red-400 rounded" />
               <span className="text-sm">Occupied</span>
             </div>
           </div>
-
-          {/* Actions */}
-          {selectedSlot && (
-            <Card className="bg-primary/5 border-primary/20">
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between gap-4">
-                  <div className="flex items-center gap-2">
-                    <AlertCircle className="w-5 h-5 text-primary" />
-                    <div>
-                      <p className="font-semibold">
-                        Slot {slots.find((s) => s.id === selectedSlot)?.slotNumber} Selected
-                      </p>
-                      <p className="text-sm text-muted-foreground">Reserve this spot for your visit</p>
-                    </div>
-                  </div>
-                  <Button onClick={handleReserveSlot} className="gap-2">
-                    <CheckCircle2 className="w-4 h-4" />
-                    Reserve
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Reserved Slots List */}
-          {reservedCount > 0 && (
-            <Card className="bg-accent/5 border-accent/20">
-              <CardHeader>
-                <CardTitle className="text-base">Your Reservations ({reservedCount})</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex flex-wrap gap-2">
-                  {slots
-                    .filter((s) => reservedSlots.has(s.id))
-                    .map((slot) => (
-                      <div key={slot.id} className="flex items-center gap-2 bg-accent/20 px-3 py-2 rounded-lg">
-                        <Clock className="w-4 h-4 text-accent" />
-                        <span className="font-semibold text-sm">Slot {slot.slotNumber}</span>
-                        <button
-                          onClick={() => handleCancelReservation(slot.id)}
-                          className="ml-2 text-xs text-muted-foreground hover:text-foreground transition-colors"
-                        >
-                          ✕
-                        </button>
-                      </div>
-                    ))}
-                </div>
-              </CardContent>
-            </Card>
-          )}
         </CardContent>
       </Card>
     </div>
