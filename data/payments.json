@@ -1,0 +1,12 @@
+{
+  "payments": [
+    {
+      "id": "payment_1764597375385",
+      "bookingId": "booking_1764597374964",
+      "amount": 50,
+      "method": "card",
+      "status": "success",
+      "createdAt": "2025-12-01T13:56:15.385Z"
+    }
+  ]
+}

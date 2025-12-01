@@ -1,3 +1,4 @@
+import parkingData from "@/parkingdata.json"
 import type { ParkingLocation, ParkingSlot, User } from "./types"
 
 // In-memory database (will use localStorage for persistence)
@@ -5,6 +6,21 @@ interface AppData {
   users: Map<string, User>
   locations: Map<string, ParkingLocation>
   slots: Map<string, ParkingSlot>
+}
+
+// Shape of data in parkingdata.json
+interface ParkingDataLocation {
+  name: string
+  address: string
+  totalSlots: number
+  slots: {
+    slotNumber: number
+    isOccupied: boolean
+  }[]
+}
+
+interface ParkingDataFile {
+  locations: ParkingDataLocation[]
 }
 
 const appData: AppData = {
@@ -37,24 +53,30 @@ function initializeMockData() {
     appData.users.set(user.email, user)
   })
 
-  const mockLocations: ParkingLocation[] = [
-    { id: "1", name: "Downtown Garage A", totalSlots: 50, address: "123 Main St" },
-    { id: "2", name: "Mall Parking Lot B", totalSlots: 100, address: "456 Shopping Ave" },
-    { id: "3", name: "Airport Garage C", totalSlots: 200, address: "789 Airport Rd" },
-  ]
+  const fileData = parkingData as ParkingDataFile
 
-  mockLocations.forEach((loc) => {
-    appData.locations.set(loc.id, loc)
-    for (let i = 1; i <= loc.totalSlots; i++) {
-      const slotId = `${loc.id}-${i}`
-      const isOccupied = Math.random() > 0.6
-      appData.slots.set(slotId, {
-        id: slotId,
-        locationId: loc.id,
-        slotNumber: i,
-        isOccupied,
-      })
+  fileData.locations.forEach((location, index) => {
+    const locationId = `loc_${index + 1}`
+
+    const loc: ParkingLocation = {
+      id: locationId,
+      name: location.name,
+      address: location.address,
+      totalSlots: location.totalSlots,
     }
+
+    appData.locations.set(locationId, loc)
+
+    location.slots.forEach((slot) => {
+      const slotId = `${locationId}-${slot.slotNumber}`
+      const slotObj: ParkingSlot = {
+        id: slotId,
+        locationId,
+        slotNumber: slot.slotNumber,
+        isOccupied: slot.isOccupied,
+      }
+      appData.slots.set(slotId, slotObj)
+    })
   })
 }
 

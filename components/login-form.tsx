@@ -9,8 +9,12 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 
-export function LoginForm() {
-  const [mode, setMode] = useState<"login" | "signup">("login")
+interface LoginFormProps {
+  initialMode?: "login" | "signup"
+}
+
+export function LoginForm({ initialMode = "login" }: LoginFormProps) {
+  const [mode, setMode] = useState<"login" | "signup">(initialMode)
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [role, setRole] = useState<"user" | "admin">("user")
@@ -88,7 +92,7 @@ export function LoginForm() {
               />
             </div>
 
-            {mode === "signup" && (
+            {mode === "login" && (
               <div>
                 <label className="text-sm font-medium text-foreground mb-1 block">I am a</label>
                 <div className="flex gap-2">

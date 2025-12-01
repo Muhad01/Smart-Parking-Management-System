@@ -4,6 +4,7 @@ import { useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/components/auth-context"
 import { AdminContent } from "@/components/admin-content"
+import { SiteHeader } from "@/components/site-header"
 
 export default function AdminPage() {
   const { user, isLoading } = useAuth()
@@ -23,5 +24,10 @@ export default function AdminPage() {
     )
   }
 
-  return <AdminContent />
+  return (
+    <div className="min-h-screen bg-background text-foreground">
+      <SiteHeader />
+      <AdminContent />
+    </div>
+  )
 }

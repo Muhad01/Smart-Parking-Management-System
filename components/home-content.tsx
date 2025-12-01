@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/components/auth-context"
 import { Button } from "@/components/ui/button"
@@ -8,66 +8,39 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ParkingSlotGrid } from "@/components/parking-slot-grid"
 import type { ParkingLocation, ParkingSlot } from "@/lib/types"
+import { db } from "@/lib/db"
 import { Search, LogOut, MapPin } from "lucide-react"
-
-// Mock data
-const mockLocations: ParkingLocation[] = [
-  { id: "1", name: "Downtown Garage", address: "123 Main St", totalSlots: 50 },
-  { id: "2", name: "Airport Parking", address: "456 Terminal Dr", totalSlots: 200 },
-  { id: "3", name: "Mall Parking", address: "789 Shopping Center Blvd", totalSlots: 150 },
-  { id: "4", name: "Hospital Lot", address: "321 Medical Way", totalSlots: 100 },
-  { id: "5", name: "Stadium Parking", address: "555 Game Ave", totalSlots: 300 },
-]
-
-const mockSlots: { [key: string]: ParkingSlot[] } = {
-  "1": Array.from({ length: 50 }, (_, i) => ({
-    id: `1-${i + 1}`,
-    locationId: "1",
-    slotNumber: i + 1,
-    isOccupied: Math.random() > 0.6,
-  })),
-  "2": Array.from({ length: 200 }, (_, i) => ({
-    id: `2-${i + 1}`,
-    locationId: "2",
-    slotNumber: i + 1,
-    isOccupied: Math.random() > 0.5,
-  })),
-  "3": Array.from({ length: 150 }, (_, i) => ({
-    id: `3-${i + 1}`,
-    locationId: "3",
-    slotNumber: i + 1,
-    isOccupied: Math.random() > 0.65,
-  })),
-  "4": Array.from({ length: 100 }, (_, i) => ({
-    id: `4-${i + 1}`,
-    locationId: "4",
-    slotNumber: i + 1,
-    isOccupied: Math.random() > 0.55,
-  })),
-  "5": Array.from({ length: 300 }, (_, i) => ({
-    id: `5-${i + 1}`,
-    locationId: "5",
-    slotNumber: i + 1,
-    isOccupied: Math.random() > 0.7,
-  })),
-}
 
 export function HomeContent() {
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedLocation, setSelectedLocation] = useState<string | null>(null)
+  const [locations, setLocations] = useState<ParkingLocation[]>([])
+  const [slotsByLocation, setSlotsByLocation] = useState<Record<string, ParkingSlot[]>>({})
   const { user, logout } = useAuth()
   const router = useRouter()
 
+  // Load locations and slots from parkingdata.json via our in‑memory db
+  useEffect(() => {
+    const allLocations = db.locations.getAll()
+    setLocations(allLocations)
+
+    const map: Record<string, ParkingSlot[]> = {}
+    allLocations.forEach((loc) => {
+      map[loc.id] = db.slots.getByLocationId(loc.id)
+    })
+    setSlotsByLocation(map)
+  }, [])
+
   const filteredLocations = useMemo(() => {
-    return mockLocations.filter(
+    return locations.filter(
       (loc) =>
         loc.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         loc.address.toLowerCase().includes(searchQuery.toLowerCase()),
     )
-  }, [searchQuery])
+  }, [searchQuery, locations])
 
   const getAvailableSlots = (locationId: string) => {
-    const slots = mockSlots[locationId] || []
+    const slots = slotsByLocation[locationId] || []
     return slots.filter((s) => !s.isOccupied).length
   }
 
@@ -80,8 +53,8 @@ export function HomeContent() {
     setSelectedLocation(locationId)
   }
 
-  const selectedLocationData = selectedLocation ? mockLocations.find((loc) => loc.id === selectedLocation) : null
-  const selectedSlots = selectedLocation ? mockSlots[selectedLocation] : []
+  const selectedLocationData = selectedLocation ? locations.find((loc) => loc.id === selectedLocation) : null
+  const selectedSlots = selectedLocation ? slotsByLocation[selectedLocation] || [] : []
 
   return (
     <div className="min-h-screen bg-background">
@@ -96,6 +69,9 @@ export function HomeContent() {
           </div>
           <div className="flex items-center gap-4">
             <span className="text-sm text-muted-foreground">{user?.email}</span>
+            <Button variant="outline" size="sm" onClick={() => router.push("/booking")}>
+              Book a slot
+            </Button>
             <Button variant="ghost" size="sm" onClick={handleLogout} className="gap-2">
               <LogOut className="w-4 h-4" />
               Logout

@@ -1,18 +1,20 @@
 "use client"
 
 import { useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { useAuth } from "@/components/auth-context"
-import { HomeContent } from "@/components/home-content"
-import { SiteHeader } from "@/components/site-header"
+import { LoginForm } from "@/components/login-form"
 
-export default function HomePage() {
+export default function LoginPage() {
   const { user, isLoading } = useAuth()
   const router = useRouter()
+  const searchParams = useSearchParams()
+
+  const modeParam = searchParams.get("mode") === "signup" ? "signup" : "login"
 
   useEffect(() => {
-    if (!isLoading && !user) {
-      router.push("/")
+    if (!isLoading && user) {
+      router.push(user.role === "admin" ? "/admin" : "/home")
     }
   }, [user, isLoading, router])
 
@@ -24,10 +26,7 @@ export default function HomePage() {
     )
   }
 
-  return (
-    <div className="min-h-screen bg-background text-foreground">
-      <SiteHeader />
-      <HomeContent />
-    </div>
-  )
+  return <LoginForm initialMode={modeParam} />
 }
+
+
