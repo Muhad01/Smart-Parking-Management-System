@@ -8,27 +8,69 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ParkingSlotGrid } from "@/components/parking-slot-grid"
 import type { ParkingLocation, ParkingSlot } from "@/lib/types"
-import { db } from "@/lib/db"
-import { Search, LogOut, MapPin } from "lucide-react"
+import { Search, LogOut, MapPin, Radio, Navigation } from "lucide-react"
+
+const DEFAULT_MAP_URL = "https://maps.google.com/"
 
 export function HomeContent() {
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedLocation, setSelectedLocation] = useState<string | null>(null)
   const [locations, setLocations] = useState<ParkingLocation[]>([])
   const [slotsByLocation, setSlotsByLocation] = useState<Record<string, ParkingSlot[]>>({})
+  const [lastUpdate, setLastUpdate] = useState<Date | null>(null)
   const { user, logout } = useAuth()
   const router = useRouter()
 
-  // Load locations and slots from parkingdata.json via our in‑memory db
+  // Load locations and slots from parkingdata.json via API and keep them updated in real-time
   useEffect(() => {
-    const allLocations = db.locations.getAll()
-    setLocations(allLocations)
+    let timeoutId: NodeJS.Timeout
+    let isMounted = true
 
-    const map: Record<string, ParkingSlot[]> = {}
-    allLocations.forEach((loc) => {
-      map[loc.id] = db.slots.getByLocationId(loc.id)
-    })
-    setSlotsByLocation(map)
+    const fetchData = async () => {
+      if (!isMounted) return
+
+      try {
+        // Add timestamp to prevent caching and ensure fresh data
+        const timestamp = Date.now()
+        const res = await fetch(`/api/locations?t=${timestamp}`, {
+          cache: "no-store",
+          headers: {
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            Pragma: "no-cache",
+          },
+        })
+        if (!res.ok) return
+        const data: { locations: ParkingLocation[]; slots: ParkingSlot[] } = await res.json()
+
+        if (!isMounted) return
+
+        setLocations(data.locations)
+
+        const map: Record<string, ParkingSlot[]> = {}
+        data.slots.forEach((slot) => {
+          if (!map[slot.locationId]) {
+            map[slot.locationId] = []
+          }
+          map[slot.locationId].push(slot)
+        })
+        setSlotsByLocation(map)
+        setLastUpdate(new Date())
+      } catch (e) {
+        console.error("Failed to fetch locations:", e)
+      } finally {
+        // Poll every 200ms for ultra-fast real-time updates when parkingdata.json changes
+        if (isMounted) {
+          timeoutId = setTimeout(fetchData, 200)
+        }
+      }
+    }
+
+    fetchData()
+
+    return () => {
+      isMounted = false
+      if (timeoutId) clearTimeout(timeoutId)
+    }
   }, [])
 
   const filteredLocations = useMemo(() => {
@@ -49,6 +91,13 @@ export function HomeContent() {
     router.push("/")
   }
 
+  const handleNavigate = (mapUrl?: string) => {
+    const targetUrl = mapUrl || DEFAULT_MAP_URL
+    if (typeof window !== "undefined") {
+      window.open(targetUrl, "_blank", "noopener,noreferrer")
+    }
+  }
+
   const handleViewLocation = (locationId: string) => {
     setSelectedLocation(locationId)
   }
@@ -58,34 +107,18 @@ export function HomeContent() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="sticky top-0 z-50 border-b border-border bg-card">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center text-white font-bold">
-              P
-            </div>
-            <span className="text-xl font-bold">SmartPark</span>
-          </div>
-          <div className="flex items-center gap-4">
-            <span className="text-sm text-muted-foreground">{user?.email}</span>
-            <Button variant="outline" size="sm" onClick={() => router.push("/booking")}>
-              Book a slot
-            </Button>
-            <Button variant="ghost" size="sm" onClick={handleLogout} className="gap-2">
-              <LogOut className="w-4 h-4" />
-              Logout
-            </Button>
-          </div>
-        </div>
-      </header>
-
       <main className="max-w-6xl mx-auto px-4 py-8">
         {!selectedLocation ? (
           <>
             {/* Search Section */}
             <div className="mb-8">
-              <h1 className="text-3xl font-bold mb-2">Find Parking</h1>
+              <div className="flex items-center gap-3 mb-2">
+                <h1 className="text-3xl font-bold">Find Parking</h1>
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <Radio className="h-3 w-3 text-green-500 animate-pulse" />
+                  <span>Live updates</span>
+                </div>
+              </div>
               <p className="text-muted-foreground mb-6">Search for available parking locations near you</p>
 
               <div className="space-y-4">
@@ -139,8 +172,22 @@ export function HomeContent() {
                           </div>
 
                           <p className="text-xs text-muted-foreground">{occupancyRate.toFixed(0)}% occupied</p>
-
-                          <Button className="w-full mt-4">View Slots</Button>
+                          <div className="flex gap-2 mt-4">
+                            <Button className="flex-1" onClick={() => handleViewLocation(location.id)}>
+                              View Slots
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                handleNavigate(location.mapUrl)
+                              }}
+                              title="Open in maps"
+                            >
+                              <Navigation className="w-4 h-4" />
+                            </Button>
+                          </div>
                         </div>
                       </CardContent>
                     </Card>
@@ -163,11 +210,23 @@ export function HomeContent() {
 
               {selectedLocationData && (
                 <>
-                  <h1 className="text-3xl font-bold mb-2">{selectedLocationData.name}</h1>
-                  <p className="text-muted-foreground flex items-center gap-1 mb-4">
-                    <MapPin className="w-4 h-4" />
-                    {selectedLocationData.address}
-                  </p>
+                  <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+                    <div>
+                      <h1 className="text-3xl font-bold mb-2">{selectedLocationData.name}</h1>
+                      <p className="text-muted-foreground flex items-center gap-1">
+                        <MapPin className="w-4 h-4" />
+                        {selectedLocationData.address}
+                      </p>
+                    </div>
+                    <Button
+                      variant="outline"
+                      className="flex items-center gap-2"
+                      onClick={() => handleNavigate(selectedLocationData.mapUrl)}
+                    >
+                      <Navigation className="w-4 h-4" />
+                      Navigate
+                    </Button>
+                  </div>
 
                   {/* Slots Summary */}
                   <div className="grid grid-cols-3 gap-4 mb-6">

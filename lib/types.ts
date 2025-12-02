@@ -13,6 +13,8 @@ export interface ParkingLocation {
   name: string
   totalSlots: number
   address: string
+  // Optional Google Maps (or similar) navigation URL for this location
+  mapUrl?: string
 }
 
 export interface ParkingSlot {

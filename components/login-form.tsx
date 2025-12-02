@@ -29,11 +29,13 @@ export function LoginForm({ initialMode = "login" }: LoginFormProps) {
 
     try {
       if (mode === "login") {
-        login(email, password)
+        await login(email, password, role)
+        router.push(role === "admin" ? "/admin" : "/home")
       } else {
-        signup(email, password, role)
+        // All new signups are always regular users
+        await signup(email, password, "user")
+        router.push("/home")
       }
-      router.push(role === "admin" ? "/admin" : "/home")
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred")
     }

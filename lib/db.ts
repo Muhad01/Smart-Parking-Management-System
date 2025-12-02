@@ -1,4 +1,4 @@
-import parkingData from "@/parkingdata.json"
+import parkingData from "@/data/parkingdata.json"
 import type { ParkingLocation, ParkingSlot, User } from "./types"
 
 // In-memory database (will use localStorage for persistence)
@@ -13,6 +13,7 @@ interface ParkingDataLocation {
   name: string
   address: string
   totalSlots: number
+  mapUrl?: string
   slots: {
     slotNumber: number
     isOccupied: boolean
@@ -63,6 +64,7 @@ function initializeMockData() {
       name: location.name,
       address: location.address,
       totalSlots: location.totalSlots,
+      mapUrl: location.mapUrl,
     }
 
     appData.locations.set(locationId, loc)

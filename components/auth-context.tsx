@@ -2,14 +2,13 @@
 
 import type React from "react"
 import { createContext, useContext, useEffect, useState } from "react"
-import { auth } from "@/lib/auth"
-import type { User } from "@/lib/types"
+import type { User, AuthSession, UserRole } from "@/lib/types"
 
 interface AuthContextType {
   user: User | null
   token: string | null
-  login: (email: string, password: string) => void
-  signup: (email: string, password: string, role: "user" | "admin") => void
+  login: (email: string, password: string, role: UserRole) => Promise<void>
+  signup: (email: string, password: string, role: UserRole) => Promise<void>
   logout: () => void
   isLoading: boolean
 }
@@ -38,25 +37,45 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsLoading(false)
   }, [])
 
-  const login = (email: string, password: string) => {
+  const login = async (email: string, password: string, role: UserRole) => {
     try {
-      const session = auth.login(email, password)
-      setUser(session.user)
-      setToken(session.token)
-      localStorage.setItem("authToken", session.token)
-      localStorage.setItem("authUser", JSON.stringify(session.user))
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password, role }),
+      })
+      const data = (await res.json()) as { error?: string } & AuthSession
+      if (!res.ok) {
+        throw new Error(data.error || "Login failed")
+      }
+
+      setUser(data.user)
+      setToken(data.token)
+      localStorage.setItem("authToken", data.token)
+      localStorage.setItem("authUser", JSON.stringify(data.user))
     } catch (error) {
       throw error
     }
   }
 
-  const signup = (email: string, password: string, role: "user" | "admin") => {
+  const signup = async (email: string, password: string, role: UserRole) => {
     try {
-      const session = auth.signup(email, password, role)
-      setUser(session.user)
-      setToken(session.token)
-      localStorage.setItem("authToken", session.token)
-      localStorage.setItem("authUser", JSON.stringify(session.user))
+      // All new signups are always regular users, not admins
+      // The role parameter is kept for API compatibility but ignored
+      const res = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      })
+      const data = (await res.json()) as { error?: string } & AuthSession
+      if (!res.ok) {
+        throw new Error(data.error || "Signup failed")
+      }
+
+      setUser(data.user)
+      setToken(data.token)
+      localStorage.setItem("authToken", data.token)
+      localStorage.setItem("authUser", JSON.stringify(data.user))
     } catch (error) {
       throw error
     }

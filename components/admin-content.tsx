@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
 import { useAuth } from "@/components/auth-context"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -14,70 +15,112 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import type { ParkingLocation, ParkingSlot } from "@/lib/types"
-import { Plus, Edit2, Trash2, LogOut, MapPin } from "lucide-react"
+import { Plus, Edit2, Trash2, MapPin } from "lucide-react"
 
 export function AdminContent() {
-  const [locations, setLocations] = useState<ParkingLocation[]>([
-    { id: "1", name: "Downtown Garage", address: "123 Main St", totalSlots: 50 },
-    { id: "2", name: "Airport Parking", address: "456 Terminal Dr", totalSlots: 200 },
-    { id: "3", name: "Mall Parking", address: "789 Shopping Center Blvd", totalSlots: 150 },
-    { id: "4", name: "Hospital Lot", address: "321 Medical Way", totalSlots: 100 },
-    { id: "5", name: "Stadium Parking", address: "555 Game Ave", totalSlots: 300 },
-  ])
-
-  const [slots, setSlots] = useState<{ [key: string]: ParkingSlot[] }>({
-    "1": Array.from({ length: 50 }, (_, i) => ({
-      id: `1-${i + 1}`,
-      locationId: "1",
-      slotNumber: i + 1,
-      isOccupied: Math.random() > 0.6,
-    })),
-    "2": Array.from({ length: 200 }, (_, i) => ({
-      id: `2-${i + 1}`,
-      locationId: "2",
-      slotNumber: i + 1,
-      isOccupied: Math.random() > 0.5,
-    })),
-    "3": Array.from({ length: 150 }, (_, i) => ({
-      id: `3-${i + 1}`,
-      locationId: "3",
-      slotNumber: i + 1,
-      isOccupied: Math.random() > 0.65,
-    })),
-    "4": Array.from({ length: 100 }, (_, i) => ({
-      id: `4-${i + 1}`,
-      locationId: "4",
-      slotNumber: i + 1,
-      isOccupied: Math.random() > 0.55,
-    })),
-    "5": Array.from({ length: 300 }, (_, i) => ({
-      id: `5-${i + 1}`,
-      locationId: "5",
-      slotNumber: i + 1,
-      isOccupied: Math.random() > 0.7,
-    })),
-  })
+  const router = useRouter()
+  const [locations, setLocations] = useState<ParkingLocation[]>([])
+  const [slots, setSlots] = useState<{ [key: string]: ParkingSlot[] }>({})
 
   const [selectedLocationForSlots, setSelectedLocationForSlots] = useState<string | null>(null)
-  const [newLocation, setNewLocation] = useState({ name: "", address: "", totalSlots: "" })
+  const [newLocation, setNewLocation] = useState({ name: "", address: "", totalSlots: "", mapUrl: "" })
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
   const [editingLocation, setEditingLocation] = useState<ParkingLocation | null>(null)
 
-  const { user, logout } = useAuth()
+  const { user } = useAuth()
+
+  // Load current parking data from parkingdata.json via API and keep synced in near real-time
+  useEffect(() => {
+    let cancelled = false
+    let timeoutId: NodeJS.Timeout
+
+    const load = async () => {
+      if (cancelled) return
+
+      try {
+        const ts = Date.now()
+        const res = await fetch(`/api/locations?t=${ts}`, {
+          cache: "no-store",
+          headers: {
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            Pragma: "no-cache",
+          },
+        })
+        if (!res.ok) return
+        const data: { locations: ParkingLocation[]; slots: ParkingSlot[] } = await res.json()
+        if (cancelled) return
+
+        setLocations(data.locations)
+        const map: { [key: string]: ParkingSlot[] } = {}
+        data.slots.forEach((slot) => {
+          if (!map[slot.locationId]) {
+            map[slot.locationId] = []
+          }
+          map[slot.locationId].push(slot)
+        })
+        setSlots(map)
+      } catch (e) {
+        console.error("Failed to load admin parking data:", e)
+      } finally {
+        if (!cancelled) {
+          timeoutId = setTimeout(load, 1000)
+        }
+      }
+    }
+
+    load()
+
+    return () => {
+      cancelled = true
+      if (timeoutId) clearTimeout(timeoutId)
+    }
+  }, [])
+
+  // Persist current admin view back to parkingdata.json
+  const persistParkingData = async (
+    nextLocations: ParkingLocation[],
+    nextSlots: { [key: string]: ParkingSlot[] },
+  ) => {
+    try {
+      const locationsForFile = nextLocations.map((loc) => {
+        const locSlots = nextSlots[loc.id] || []
+        return {
+          name: loc.name,
+          address: loc.address,
+          totalSlots: loc.totalSlots,
+          // Persist explicit mapUrl if provided, otherwise fall back to default Google Maps URL
+          mapUrl: loc.mapUrl && loc.mapUrl.trim().length > 0 ? loc.mapUrl : "https://maps.google.com/",
+          slots: locSlots.map((s) => ({
+            slotNumber: s.slotNumber,
+            isOccupied: s.isOccupied,
+          })),
+        }
+      })
+
+      await fetch("/api/admin/parkingdata", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ locations: locationsForFile }),
+      })
+    } catch (e) {
+      console.error("Failed to save parkingdata.json from admin:", e)
+    }
+  }
 
   const handleAddLocation = () => {
     if (newLocation.name && newLocation.address && newLocation.totalSlots) {
+      const trimmedMapUrl = newLocation.mapUrl.trim()
       const location: ParkingLocation = {
-        id: Date.now().toString(),
+        id: `loc_${locations.length + 1}`,
         name: newLocation.name,
         address: newLocation.address,
         totalSlots: Number.parseInt(newLocation.totalSlots),
+        mapUrl: trimmedMapUrl || undefined,
       }
-      setLocations([...locations, location])
-
+      const newLocations = [...locations, location]
       const newLocationId = location.id
-      setSlots({
+      const newSlots = {
         ...slots,
         [newLocationId]: Array.from({ length: location.totalSlots }, (_, i) => ({
           id: `${newLocationId}-${i + 1}`,
@@ -85,9 +128,12 @@ export function AdminContent() {
           slotNumber: i + 1,
           isOccupied: false,
         })),
-      })
+      }
+      setLocations(newLocations)
+      setSlots(newSlots)
+      void persistParkingData(newLocations, newSlots)
 
-      setNewLocation({ name: "", address: "", totalSlots: "" })
+      setNewLocation({ name: "", address: "", totalSlots: "", mapUrl: "" })
       setIsAddDialogOpen(false)
     }
   }
@@ -99,10 +145,20 @@ export function AdminContent() {
 
   const handleSaveEditLocation = () => {
     if (editingLocation && editingLocation.name && editingLocation.address && editingLocation.totalSlots > 0) {
-      setLocations(locations.map((loc) => (loc.id === editingLocation.id ? editingLocation : loc)))
+      const normalizedEditingLocation: ParkingLocation = {
+        ...editingLocation,
+        mapUrl:
+          editingLocation.mapUrl && editingLocation.mapUrl.trim().length > 0
+            ? editingLocation.mapUrl
+            : undefined,
+      }
+      const updatedLocations = locations.map((loc) =>
+        loc.id === normalizedEditingLocation.id ? normalizedEditingLocation : loc,
+      )
 
       // Update slots if total slots changed
       const oldTotalSlots = slots[editingLocation.id]?.length || 0
+      let updatedSlots = { ...slots }
       if (editingLocation.totalSlots !== oldTotalSlots) {
         if (editingLocation.totalSlots > oldTotalSlots) {
           // Add new slots
@@ -112,18 +168,22 @@ export function AdminContent() {
             slotNumber: oldTotalSlots + i + 1,
             isOccupied: false,
           }))
-          setSlots({
-            ...slots,
-            [editingLocation.id]: [...(slots[editingLocation.id] || []), ...newSlots],
-          })
+          updatedSlots = {
+            ...updatedSlots,
+            [editingLocation.id]: [...(updatedSlots[editingLocation.id] || []), ...newSlots],
+          }
         } else {
           // Remove slots from the end
-          setSlots({
-            ...slots,
-            [editingLocation.id]: (slots[editingLocation.id] || []).slice(0, editingLocation.totalSlots),
-          })
+          updatedSlots = {
+            ...updatedSlots,
+            [editingLocation.id]: (updatedSlots[editingLocation.id] || []).slice(0, editingLocation.totalSlots),
+          }
         }
       }
+
+      setLocations(updatedLocations)
+      setSlots(updatedSlots)
+      void persistParkingData(updatedLocations, updatedSlots)
 
       setIsEditDialogOpen(false)
       setEditingLocation(null)
@@ -131,10 +191,12 @@ export function AdminContent() {
   }
 
   const handleDeleteLocation = (id: string) => {
-    setLocations(locations.filter((loc) => loc.id !== id))
+    const newLocations = locations.filter((loc) => loc.id !== id)
     const newSlots = { ...slots }
     delete newSlots[id]
+    setLocations(newLocations)
     setSlots(newSlots)
+    void persistParkingData(newLocations, newSlots)
     if (selectedLocationForSlots === id) {
       setSelectedLocationForSlots(null)
     }
@@ -148,27 +210,7 @@ export function AdminContent() {
   const occupiedSlotsCount = selectedLocationSlots.filter((s) => s.isOccupied).length
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="sticky top-0 z-50 border-b border-border bg-card">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center text-white font-bold">
-              A
-            </div>
-            <span className="text-xl font-bold">SmartPark Admin</span>
-          </div>
-          <div className="flex items-center gap-4">
-            <span className="text-sm text-muted-foreground">{user?.email}</span>
-            <Button variant="ghost" size="sm" onClick={logout} className="gap-2">
-              <LogOut className="w-4 h-4" />
-              Logout
-            </Button>
-          </div>
-        </div>
-      </header>
-
-      <main className="max-w-7xl mx-auto px-4 py-8">
+    <div className="max-w-7xl mx-auto px-4 py-8">
         {!selectedLocationForSlots ? (
           <>
             {/* Dashboard Summary */}
@@ -242,6 +284,16 @@ export function AdminContent() {
                         placeholder="e.g., 50"
                         value={newLocation.totalSlots}
                         onChange={(e) => setNewLocation({ ...newLocation, totalSlots: e.target.value })}
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-foreground mb-1 block">
+                        Google Maps Link (optional)
+                      </label>
+                      <Input
+                        placeholder="e.g., https://maps.google.com/?q=Downtown+Garage"
+                        value={newLocation.mapUrl}
+                        onChange={(e) => setNewLocation({ ...newLocation, mapUrl: e.target.value })}
                       />
                     </div>
                     <div className="flex gap-2 pt-4">
@@ -357,6 +409,21 @@ export function AdminContent() {
                         value={editingLocation.totalSlots}
                         onChange={(e) =>
                           setEditingLocation({ ...editingLocation, totalSlots: Number.parseInt(e.target.value) || 0 })
+                        }
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-foreground mb-1 block">
+                        Google Maps Link (optional)
+                      </label>
+                      <Input
+                        placeholder="e.g., https://maps.google.com/?q=Downtown+Garage"
+                        value={editingLocation.mapUrl || ""}
+                        onChange={(e) =>
+                          setEditingLocation({
+                            ...editingLocation,
+                            mapUrl: e.target.value,
+                          })
                         }
                       />
                     </div>
@@ -480,7 +547,6 @@ export function AdminContent() {
             </div>
           </>
         )}
-      </main>
     </div>
   )
 }

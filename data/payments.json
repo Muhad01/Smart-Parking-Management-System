@@ -1,12 +1,116 @@
 {
   "payments": [
     {
-      "id": "payment_1764597375385",
-      "bookingId": "booking_1764597374964",
-      "amount": 50,
+      "id": "payment_1764606466254",
+      "bookingId": "booking_1764606458817",
+      "amount": 2,
       "method": "card",
       "status": "success",
-      "createdAt": "2025-12-01T13:56:15.385Z"
+      "createdAt": "2025-12-01T16:27:46.254Z"
+    },
+    {
+      "id": "payment_1764606472362",
+      "bookingId": "booking_1764606323580",
+      "amount": 2,
+      "method": "card",
+      "status": "success",
+      "createdAt": "2025-12-01T16:27:52.362Z"
+    },
+    {
+      "id": "payment_1764606710081",
+      "bookingId": "booking_1764606622376",
+      "amount": 2,
+      "method": "card",
+      "status": "success",
+      "createdAt": "2025-12-01T16:31:50.081Z"
+    },
+    {
+      "id": "payment_1764606772054",
+      "bookingId": "booking_1764606611766",
+      "amount": 2,
+      "method": "card",
+      "status": "success",
+      "createdAt": "2025-12-01T16:32:52.054Z"
+    },
+    {
+      "id": "payment_1764607165947",
+      "bookingId": "booking_1764606610988",
+      "amount": 2,
+      "method": "card",
+      "status": "success",
+      "createdAt": "2025-12-01T16:39:25.947Z"
+    },
+    {
+      "id": "payment_1764607168570",
+      "bookingId": "booking_1764606998523",
+      "amount": 2,
+      "method": "card",
+      "status": "success",
+      "createdAt": "2025-12-01T16:39:28.571Z"
+    },
+    {
+      "id": "payment_1764607180100",
+      "bookingId": "booking_1764607173687",
+      "amount": 2,
+      "method": "card",
+      "status": "success",
+      "createdAt": "2025-12-01T16:39:40.100Z"
+    },
+    {
+      "id": "payment_1764607182650",
+      "bookingId": "booking_1764607175493",
+      "amount": 2,
+      "method": "card",
+      "status": "success",
+      "createdAt": "2025-12-01T16:39:42.650Z"
+    },
+    {
+      "id": "payment_1764607501746",
+      "bookingId": "booking_1764607491969",
+      "amount": 2,
+      "method": "card",
+      "status": "success",
+      "createdAt": "2025-12-01T16:45:01.746Z"
+    },
+    {
+      "id": "payment_1764656697024",
+      "bookingId": "booking_1764607807188",
+      "amount": 28,
+      "method": "card",
+      "status": "success",
+      "createdAt": "2025-12-02T06:24:57.024Z"
+    },
+    {
+      "id": "payment_1764657335720",
+      "bookingId": "booking_1764656741529",
+      "amount": 2,
+      "method": "card",
+      "status": "success",
+      "createdAt": "2025-12-02T06:35:35.720Z"
+    },
+    {
+      "id": "payment_1764675886985",
+      "bookingId": "booking_1764657400058",
+      "amount": 11,
+      "method": "card",
+      "status": "success",
+      "createdAt": "2025-12-02T11:44:46.985Z"
+    },
+    {
+      "id": "payment_1764676615029",
+      "bookingId": "booking_1764676505814",
+      "amount": 1,
+      "method": "card",
+      "status": "success",
+      "createdAt": "2025-12-02T11:56:55.029Z"
+    },
+    {
+      "id": "payment_1764680871671",
+      "bookingId": "booking_1764676623471",
+      "amount": 3,
+      "method": "card",
+      "status": "success",
+      "createdAt": "2025-12-02T13:07:51.671Z"
     }
   ]
 }

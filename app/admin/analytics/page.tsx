@@ -4,7 +4,6 @@ import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/components/auth-context"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { SiteHeader } from "@/components/site-header"
 
 interface Booking {
   id: string
@@ -60,7 +59,6 @@ export default function AdminAnalyticsPage() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <SiteHeader />
       <main className="max-w-5xl mx-auto px-4 py-10 space-y-6">
         <h1 className="text-2xl font-semibold tracking-tight mb-4">Admin Dashboard & Analytics</h1>
 

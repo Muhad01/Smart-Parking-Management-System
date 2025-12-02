@@ -1,0 +1,13 @@
+{
+  "arduino": {
+    "port": "COM6",
+    "baudRate": 9600,
+    "timeout": 1,
+    "autoDetect": true
+  },
+  "updateInterval": 1000,
+  "targetLocation": "Testing",
+  "enabled": true,
+  "lastUpdate": "2025-12-02 16:56:30",
+  "status": "connected"
+}

@@ -13,12 +13,15 @@ export const auth = {
       throw new Error("User already exists")
     }
 
+    // Force all new signups to be regular users, not admins
+    const userRole: UserRole = "user"
+
     const userId = Date.now().toString()
     const user: User = {
       id: userId,
       email,
       password,
-      role,
+      role: userRole,
       createdAt: new Date(),
     }
 
@@ -45,6 +48,7 @@ export const auth = {
 
   getSession: (token: string): User | null => {
     const userId = token.split("_")[1]
-    return userId ? db.users.findById(userId) : null
+    const user = userId ? db.users.findById(userId) : undefined
+    return user ?? null
   },
 }
