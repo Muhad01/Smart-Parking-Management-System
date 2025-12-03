@@ -10,6 +10,7 @@ import { ChevronLeft, ChevronRight, MapPin, CalendarClock, Search, LogOut, Navig
 import { db } from "@/lib/db"
 import { BookingPopup } from "@/components/booking-popup"
 import { PaymentPopup } from "@/components/payment-popup"
+import { DarkModeToggle } from "@/components/dark-mode-toggle"
 import type { ParkingLocation } from "@/lib/types"
 
 const DEFAULT_MAP_URL = "https://maps.google.com/"
@@ -349,6 +350,7 @@ export default function BookingPage() {
         amount={payAmount}
         onPaid={handlePaid}
       />
+      <DarkModeToggle />
     </div>
   )
 }

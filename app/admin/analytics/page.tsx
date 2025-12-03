@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/components/auth-context"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { DarkModeToggle } from "@/components/dark-mode-toggle"
 
 interface Booking {
   id: string
@@ -112,6 +113,7 @@ export default function AdminAnalyticsPage() {
           </CardContent>
         </Card>
       </main>
+      <DarkModeToggle />
     </div>
   )
 }

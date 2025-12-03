@@ -7,6 +7,7 @@ import type { ParkingLocation, ParkingSlot } from "@/lib/types"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { DarkModeToggle } from "@/components/dark-mode-toggle"
 
 export default function NewBookingPage() {
   const { user, isLoading } = useAuth()
@@ -200,6 +201,7 @@ export default function NewBookingPage() {
           </CardContent>
         </Card>
       </div>
+      <DarkModeToggle />
     </div>
   )
 }
