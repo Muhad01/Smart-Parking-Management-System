@@ -98,6 +98,7 @@ export default function NewBookingPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           userEmail: user.email,
+          userName: user.fullName,
           locationId: selectedLocationId,
           slotNumber: selectedSlotNumber,
         }),

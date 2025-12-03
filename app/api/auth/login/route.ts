@@ -7,6 +7,7 @@ interface AuthUserRecord {
   id: string
   email: string
   password: string
+  fullName?: string
   role: UserRole
   createdAt: string
 }
@@ -41,6 +42,7 @@ export async function POST(request: Request) {
         id: seeded.id,
         email: seeded.email,
         password: seeded.password,
+        fullName: seeded.fullName,
         role: seeded.role,
         createdAt: seeded.createdAt.toISOString(),
       }
@@ -61,6 +63,7 @@ export async function POST(request: Request) {
     id: record.id,
     email: record.email,
     password: record.password,
+    fullName: record.fullName,
     role: record.role,
     createdAt: new Date(record.createdAt),
   }
@@ -72,6 +75,7 @@ export async function POST(request: Request) {
 
   return NextResponse.json(session)
 }
+
 
 
 

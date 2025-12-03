@@ -8,7 +8,7 @@ interface AuthContextType {
   user: User | null
   token: string | null
   login: (email: string, password: string, role: UserRole) => Promise<void>
-  signup: (email: string, password: string, role: UserRole) => Promise<void>
+  signup: (email: string, password: string, fullName: string, role: UserRole) => Promise<void>
   logout: () => void
   isLoading: boolean
 }
@@ -58,14 +58,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
-  const signup = async (email: string, password: string, role: UserRole) => {
+  const signup = async (email: string, password: string, fullName: string, role: UserRole) => {
     try {
       // All new signups are always regular users, not admins
       // The role parameter is kept for API compatibility but ignored
       const res = await fetch("/api/auth/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, password, fullName }),
       })
       const data = (await res.json()) as { error?: string } & AuthSession
       if (!res.ok) {

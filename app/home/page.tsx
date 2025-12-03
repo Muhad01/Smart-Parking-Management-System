@@ -82,8 +82,8 @@ export default function HomePage() {
         <div className="px-3 py-4 border-t border-border text-[11px] space-y-3">
           <div className="flex items-center justify-between">
             {expanded && (
-              <p className="text-muted-foreground truncate text-[11px]" title={user?.email || ""}>
-                {user?.email}
+              <p className="text-muted-foreground truncate text-[11px]" title={user?.fullName || user?.email || ""}>
+                {user?.fullName || user?.email}
               </p>
             )}
             <Button
@@ -106,7 +106,7 @@ export default function HomePage() {
           </div>
 
           <div className="border-t border-border pt-2 space-y-2">
-            {expanded && !user?.email && <p className="text-muted-foreground">Not signed in</p>}
+            {expanded && !user && <p className="text-muted-foreground">Not signed in</p>}
           {expanded && (
               <Button
                 type="button"

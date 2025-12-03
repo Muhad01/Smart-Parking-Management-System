@@ -3254,13 +3254,15 @@
         },
         {
           "slotNumber": 2,
-          "isOccupied": false
+          "isOccupied": true
         },
         {
           "slotNumber": 3,
           "isOccupied": false
         }
-      ]
+      ],
+      "occupiedSlots": 1,
+      "availableSlots": 2
     }
   ]
 }

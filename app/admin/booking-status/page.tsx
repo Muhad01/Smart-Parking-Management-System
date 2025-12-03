@@ -26,6 +26,7 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } f
 interface Booking {
   id: string
   userEmail: string
+  userName?: string
   locationId: string
   locationName: string
   slotNumber: number
@@ -220,6 +221,7 @@ export default function BookingStatusPage() {
       filtered = filtered.filter(
         (b) =>
           b.userEmail.toLowerCase().includes(q) ||
+          (b.userName || "").toLowerCase().includes(q) ||
           (b.locationName || b.locationId).toLowerCase().includes(q) ||
           String(b.slotNumber).includes(q),
       )
@@ -527,7 +529,7 @@ export default function BookingStatusPage() {
                           )}
                         </CardTitle>
                         <CardDescription className="text-xs mt-1">
-                          Slot {booking.slotNumber} · {booking.userEmail}
+                          Slot {booking.slotNumber} · {booking.userName || booking.userEmail}
                         </CardDescription>
                       </div>
                     </div>
@@ -636,8 +638,8 @@ export default function BookingStatusPage() {
         <div className="px-3 py-4 border-t border-border text-[11px] space-y-3">
           <div className="flex items-center justify-between">
             {expanded && (
-              <p className="text-muted-foreground truncate text-[11px]" title={user?.email || ""}>
-                {user?.email}
+              <p className="text-muted-foreground truncate text-[11px]" title={user?.fullName || user?.email || ""}>
+                {user?.fullName || user?.email}
               </p>
             )}
             <Button
@@ -660,7 +662,7 @@ export default function BookingStatusPage() {
           </div>
 
           <div className="border-t border-border pt-2 space-y-2">
-            {expanded && !user?.email && <p className="text-muted-foreground">Not signed in</p>}
+            {expanded && !user && <p className="text-muted-foreground">Not signed in</p>}
             {expanded && (
               <Button
                 type="button"

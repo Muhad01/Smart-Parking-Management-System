@@ -17,6 +17,7 @@ export function LoginForm({ initialMode = "login" }: LoginFormProps) {
   const [mode, setMode] = useState<"login" | "signup">(initialMode)
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [fullName, setFullName] = useState("")
   const [role, setRole] = useState<"user" | "admin">("user")
   const [error, setError] = useState("")
   const [stayLoggedIn, setStayLoggedIn] = useState(false)
@@ -33,26 +34,16 @@ export function LoginForm({ initialMode = "login" }: LoginFormProps) {
         router.push(role === "admin" ? "/admin" : "/home")
       } else {
         // All new signups are always regular users
-        await signup(email, password, "user")
+        if (!fullName.trim()) {
+          setError("Full name is required")
+          return
+        }
+        await signup(email, password, fullName, "user")
         router.push("/home")
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred")
     }
-  }
-
-  const handleDemoUserLogin = () => {
-    setEmail("user@example.com")
-    setPassword("password")
-    setMode("login")
-    setError("")
-  }
-
-  const handleDemoAdminLogin = () => {
-    setEmail("admin@example.com")
-    setPassword("password")
-    setMode("login")
-    setError("")
   }
 
   return (
@@ -72,6 +63,18 @@ export function LoginForm({ initialMode = "login" }: LoginFormProps) {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
+            {mode === "signup" && (
+              <div>
+                <label className="text-sm font-medium text-foreground mb-1 block">Full Name</label>
+                <Input
+                  type="text"
+                  placeholder="John Doe"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  required
+                />
+              </div>
+            )}
             <div>
               <label className="text-sm font-medium text-foreground mb-1 block">Email</label>
               <Input
@@ -157,40 +160,12 @@ export function LoginForm({ initialMode = "login" }: LoginFormProps) {
               onClick={() => {
                 setMode(mode === "login" ? "signup" : "login")
                 setError("")
+                setFullName("")
               }}
             >
               {mode === "login" ? "Sign Up" : "Sign In"}
             </Button>
           </form>
-
-          <div className="mt-6 p-4 bg-muted rounded-lg space-y-3">
-            <p className="text-xs font-medium text-muted-foreground">Quick Demo Login:</p>
-            <Button
-              type="button"
-              variant="outline"
-              className="w-full text-sm bg-transparent"
-              onClick={() => {
-                handleDemoUserLogin()
-              }}
-            >
-              Try as User
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              className="w-full text-sm bg-transparent"
-              onClick={() => {
-                handleDemoAdminLogin()
-              }}
-            >
-              Try as Admin
-            </Button>
-            <p className="text-xs text-muted-foreground pt-2 border-t border-border">
-              Email: user@example.com or admin@example.com
-              <br />
-              Password: password
-            </p>
-          </div>
         </CardContent>
       </Card>
     </div>

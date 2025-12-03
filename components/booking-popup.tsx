@@ -10,9 +10,10 @@ interface BookingPopupProps {
   open: boolean
   onClose: () => void
   userEmail: string
+  userName?: string
 }
 
-export function BookingPopup({ open, onClose, userEmail }: BookingPopupProps) {
+export function BookingPopup({ open, onClose, userEmail, userName }: BookingPopupProps) {
   const [locations, setLocations] = useState<ParkingLocation[]>([])
   const [slots, setSlots] = useState<ParkingSlot[]>([])
   const [selectedLocationId, setSelectedLocationId] = useState<string>("")
@@ -94,6 +95,7 @@ export function BookingPopup({ open, onClose, userEmail }: BookingPopupProps) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           userEmail,
+          userName,
           locationId: selectedLocationId,
           slotNumber: selectedSlotNumber,
         }),

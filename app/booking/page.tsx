@@ -17,6 +17,7 @@ const DEFAULT_MAP_URL = "https://maps.google.com/"
 interface Booking {
   id: string
   userEmail: string
+  userName?: string
   locationId: string
   locationName?: string
   slotNumber: number
@@ -157,8 +158,8 @@ export default function BookingPage() {
         <div className="px-3 py-4 border-t border-border text-[11px] space-y-3">
           <div className="flex items-center justify-between">
             {expanded && (
-              <p className="text-muted-foreground truncate text-[11px]" title={user?.email || ""}>
-                {user?.email}
+              <p className="text-muted-foreground truncate text-[11px]" title={user?.fullName || user?.email || ""}>
+                {user?.fullName || user?.email}
               </p>
             )}
             <Button
@@ -181,7 +182,7 @@ export default function BookingPage() {
           </div>
 
           <div className="border-t border-border pt-2 space-y-2">
-            {expanded && !user?.email && <p className="text-muted-foreground">Not signed in</p>}
+            {expanded && !user && <p className="text-muted-foreground">Not signed in</p>}
             {expanded && (
               <Button
                 type="button"
@@ -288,7 +289,7 @@ export default function BookingPage() {
                           {locationName}
                         </CardTitle>
                         <CardDescription className="text-xs">
-                          Slot {b.slotNumber} · {b.userEmail}
+                          Slot {b.slotNumber} · {b.userName || b.userEmail}
                           {locationAddress && <> · {locationAddress}</>}
                         </CardDescription>
                       </CardHeader>
@@ -335,6 +336,7 @@ export default function BookingPage() {
           open={showBookingPopup}
           onClose={() => setShowBookingPopup(false)}
           userEmail={user.email}
+          userName={user.fullName}
         />
       )}
       <PaymentPopup

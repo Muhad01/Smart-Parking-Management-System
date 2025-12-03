@@ -7,6 +7,7 @@ interface AuthUserRecord {
   id: string
   email: string
   password: string
+  fullName?: string
   role: UserRole
   createdAt: string
 }
@@ -23,9 +24,9 @@ function generateToken(userId: string): string {
 
 export async function POST(request: Request) {
   const body = await request.json()
-  const { email, password } = body as { email?: string; password?: string }
+  const { email, password, fullName } = body as { email?: string; password?: string; fullName?: string }
 
-  if (!email || !password) {
+  if (!email || !password || !fullName) {
     return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
   }
 
@@ -43,6 +44,7 @@ export async function POST(request: Request) {
     id: userId,
     email,
     password,
+    fullName: fullName.trim(),
     role,
     createdAt: new Date().toISOString(),
   }
@@ -55,6 +57,7 @@ export async function POST(request: Request) {
     id: userId,
     email,
     password,
+    fullName: fullName.trim(),
     role,
     createdAt: new Date(record.createdAt),
   }

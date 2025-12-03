@@ -6,6 +6,7 @@ import path from "path"
 interface Booking {
   id: string
   userEmail: string
+  userName?: string
   locationId: string
   locationName: string
   slotNumber: number
@@ -85,7 +86,7 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   const body = await request.json()
-  const { userEmail, locationId, slotNumber } = body as Partial<Booking>
+  const { userEmail, userName, locationId, slotNumber } = body as Partial<Booking>
 
   if (!userEmail || !locationId || typeof slotNumber !== "number") {
     return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
@@ -113,6 +114,7 @@ export async function POST(request: Request) {
   const booking: Booking = {
     id: `booking_${Date.now()}`,
     userEmail,
+    userName: userName || undefined,
     locationId,
     locationName,
     slotNumber,

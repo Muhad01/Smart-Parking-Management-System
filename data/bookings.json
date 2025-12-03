@@ -59,6 +59,17 @@
       "createdAt": "2025-12-02T11:57:03.471Z",
       "paid": true,
       "paidAt": "2025-12-02T13:07:51.694Z"
+    },
+    {
+      "id": "booking_1764739734315",
+      "userEmail": "muhad@demo.com",
+      "userName": "Muhad",
+      "locationId": "loc_6",
+      "locationName": "Testing",
+      "slotNumber": 2,
+      "createdAt": "2025-12-03T05:28:54.315Z",
+      "paid": false,
+      "paidAt": null
     }
   ]
 }
