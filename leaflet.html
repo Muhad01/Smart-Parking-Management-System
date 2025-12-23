@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Smart Parking Cloud Architecture – Leaflet</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Arial, sans-serif;
+      background: #e5e7eb;
+      padding: 24px;
+    }
+    .leaflet {
+      width: 1024px;          /* good for A4 landscape */
+      height: 420px;          /* adjust as needed */
+      margin: 0 auto;
+      display: flex;
+      background: #ffffff;
+      border: 1px solid #d1d5db;
+      box-shadow: 0 10px 25px rgba(15, 23, 42, 0.15);
+    }
+    .panel {
+      flex: 1;
+      padding: 18px 18px 14px;
+      border-right: 1px solid #e5e7eb;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .panel:last-child {
+      border-right: none;
+    }
+    .title {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #111827;
+      margin-bottom: 10px;
+    }
+    h2 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #111827;
+      margin-bottom: 8px;
+    }
+    h3 {
+      font-size: 14px;
+      font-weight: 700;
+      color: #111827;
+      margin: 10px 0 4px;
+    }
+    p {
+      font-size: 12px;
+      line-height: 1.4;
+      color: #111827;
+      margin-bottom: 6px;
+    }
+    ul {
+      margin: 4px 0 4px 16px;
+    }
+    li {
+      font-size: 12px;
+      line-height: 1.4;
+      color: #111827;
+      margin-bottom: 4px;
+    }
+    .highlight {
+      background: #e0f2fe;
+      border-left: 3px solid #2563eb;
+      padding: 6px 8px;
+      margin: 8px 0;
+      font-size: 12px;
+    }
+    .tagline {
+      font-size: 12px;
+      font-weight: 600;
+      color: #2563eb;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 8px;
+    }
+    .small {
+      font-size: 11px;
+      color: #4b5563;
+    }
+    .footer {
+      font-size: 11px;
+      color: #6b7280;
+      margin-top: 10px;
+    }
+    .divider {
+      border-top: 1px solid #e5e7eb;
+      margin: 8px 0;
+    }
+    .clo {
+      font-size: 11px;
+      color: #374151;
+      margin-top: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div class="leaflet">
+    <!-- PANEL 1: COVER / CONTEXT -->
+    <div class="panel">
+      <div>
+        <div class="tagline">Cloud Computing (SE‑315)</div>
+        <div class="title">Smart Parking Management System</div>
+
+        <h2>Complex Engineering Activity (BESE‑29 A &amp; C)</h2>
+        <p class="small">
+          Military College of Signals – National University of Sciences &amp; Technology (NUST)
+        </p>
+
+        <h3>Problem Context</h3>
+        <p>
+          In dense urban areas, drivers waste time and fuel searching for parking. Our
+          Smart Parking Management System provides real‑time slot visibility, online
+          bookings, and digital payments using a secure public‑cloud deployment.
+        </p>
+
+        <h3>CEA Objective</h3>
+        <div class="highlight">
+          Architect and justify a <strong>secure, scalable, fault‑tolerant</strong> multi‑tier
+          cloud solution (frontend, backend APIs, data store) without deploying live
+          resources, but with an engineering‑grade design.
+        </div>
+
+        <h3>Key Learning Outcomes</h3>
+        <ul>
+          <li><strong>CLO1:</strong> Design &amp; justify cloud architecture.</li>
+          <li><strong>CLO2:</strong> Analyze reliability, scalability, security &amp; ops.</li>
+          <li><strong>CLO4:</strong> Evaluate cost and optimization trade‑offs.</li>
+        </ul>
+      </div>
+
+      <div class="footer">
+        <strong>Team:</strong> &lt;Names &amp; Reg. Nos.&gt;<br/>
+        <strong>Date:</strong> 22 Dec 2025
+      </div>
+    </div>
+
+    <!-- PANEL 2: ARCHITECTURE, RELIABILITY & SCALABILITY -->
+    <div class="panel">
+      <div>
+        <h2>Cloud Architecture Overview</h2>
+        <p class="small"><strong>Provider:</strong> AWS (concepts map to Azure/GCP).</p>
+
+        <h3>Multi‑Tier Design</h3>
+        <ul>
+          <li><strong>Frontend:</strong> React/Next.js SPA on S3, served via CloudFront (HTTPS, CDN).</li>
+          <li><strong>Backend APIs:</strong> Node.js/Express containers on ECS Fargate behind ALB.</li>
+          <li><strong>Data Tier:</strong> Amazon RDS PostgreSQL (Multi‑AZ) + ElastiCache Redis.</li>
+          <li><strong>Storage:</strong> S3 for logs, reports, backups.</li>
+        </ul>
+
+        <h3>Networks &amp; Trust Boundaries</h3>
+        <ul>
+          <li>Dedicated VPC with 3 AZs.</li>
+          <li>Public subnets: ALB, NAT, CloudFront/WAF edge.</li>
+          <li>Private app subnets: ECS tasks (no direct Internet ingress).</li>
+          <li>Private data subnets: RDS &amp; Redis, reachable only from app tier.</li>
+        </ul>
+
+        <div class="highlight">
+          <strong>Data Flow</strong><br/>
+          User → Browser → CloudFront/WAF → ALB → ECS APIs → RDS/Redis → response to user.
+        </div>
+
+        <div class="divider"></div>
+
+        <h2>Reliability &amp; Scalability</h2>
+
+        <h3>Reliability &amp; Fault Tolerance</h3>
+        <ul>
+          <li>Multi‑AZ ECS tasks and RDS with automatic failover.</li>
+          <li>Health checks on ALB + ECS for self‑healing of failed tasks.</li>
+          <li>Automated backups, point‑in‑time restore, and audit logging.</li>
+        </ul>
+
+        <p class="small">
+          <strong>SLOs:</strong> 99.9% uptime, p95 latency &lt; 300 ms, error rate &lt; 1%, RPO 5 min, RTO 30 min.
+        </p>
+
+        <h3>Scalability Plan</h3>
+        <ul>
+          <li>Assumed load: ~10k DAU, peak ≈ 100 RPS (3× safety margin).</li>
+          <li>ECS autoscaling: 3–10 tasks based on CPU and RPS per task.</li>
+          <li>RDS scaling: vertical scale + read replicas if read load grows.</li>
+          <li>Redis caching: parking availability &amp; hot configuration to offload DB.</li>
+        </ul>
+      </div>
+
+      <div class="clo">
+        <strong>CLO1 &amp; CLO2:</strong> Architecture design, reliability &amp; scalability analysis
+        with quantified SLOs and capacity planning.
+      </div>
+    </div>
+
+    <!-- PANEL 3: SECURITY, OPS, COST, TESTING, RISKS -->
+    <div class="panel">
+      <div>
+        <h2>Security &amp; Compliance</h2>
+
+        <h3>Network &amp; Access Control</h3>
+        <ul>
+          <li>Strict security groups; no database access from the Internet.</li>
+          <li>AWS WAF in front of CloudFront/ALB (OWASP Top 10, rate limiting).</li>
+          <li>Least‑privilege IAM roles for ECS, CI/CD, and DB access.</li>
+        </ul>
+
+        <h3>Encryption &amp; Secrets</h3>
+        <ul>
+          <li>HTTPS everywhere (TLS 1.2+), HSTS, secure cookies.</li>
+          <li>RDS, ElastiCache, and S3 encrypted at rest via KMS.</li>
+          <li>All secrets (DB, JWT keys, API keys) in AWS Secrets Manager with rotation.</li>
+        </ul>
+
+        <div class="divider"></div>
+
+        <h2>Operations, Monitoring &amp; Cost</h2>
+
+        <h3>CI/CD &amp; Monitoring</h3>
+        <ul>
+          <li>Git‑based flow with GitHub Actions / GitLab CI.</li>
+          <li>Pipeline: build → tests → security scan → staging → smoke tests → prod (blue‑green).</li>
+          <li>CloudWatch metrics, logs, dashboards, and alerts (errors, latency, CPU, DB health).</li>
+          <li>Runbooks for incidents: service outage, DB performance, payment gateway failure.</li>
+        </ul>
+
+        <h3>Cost &amp; Optimization</h3>
+        <ul>
+          <li>Estimated baseline: ≈ <strong>$500–$850 / month</strong> (ECS, RDS, Redis, S3, CF, WAF, logs).</li>
+          <li>Optimization: rightsizing, Savings Plans/Reserved Instances, aggressive caching.</li>
+          <li>Cost controls: budgets + alerts, limit non‑prod runtime, cheaper storage tiers for logs.</li>
+        </ul>
+
+        <div class="divider"></div>
+
+        <h2>Testing &amp; Risk Management</h2>
+
+        <h3>Testing Strategy</h3>
+        <ul>
+          <li>Unit &amp; integration tests for core APIs (bookings, payments, admin).</li>
+          <li>E2E browser tests for key user journeys.</li>
+          <li>Load tests (e.g., k6/JMeter) up to and beyond 100 RPS.</li>
+          <li>Chaos tests: task kill, RDS failover, simulated latency; verify SLOs.</li>
+        </ul>
+
+        <h3>Top Risks &amp; Mitigations</h3>
+        <ul>
+          <li><strong>DB bottleneck:</strong> indexes, Redis cache, vertical scale, read replicas.</li>
+          <li><strong>Misconfig SG/IAM:</strong> IaC, reviews, principle of least privilege.</li>
+          <li><strong>Cost spikes:</strong> budgets, dashboards, scheduled shutdowns for non‑prod.</li>
+          <li><strong>DDoS / malicious traffic:</strong> WAF rules, rate limits, AWS Shield.</li>
+        </ul>
+      </div>
+
+      <div class="clo">
+        <strong>CLO2 &amp; CLO4:</strong> Security design, monitoring, ops, testing, cost estimation,
+        optimization and risk mitigation aligned with CEA rubric.
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+
+

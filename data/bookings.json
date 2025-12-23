@@ -68,6 +68,61 @@
       "locationName": "Testing",
       "slotNumber": 2,
       "createdAt": "2025-12-03T05:28:54.315Z",
+      "paid": true,
+      "paidAt": "2025-12-11T06:56:57.936Z"
+    },
+    {
+      "id": "booking_1765436725496",
+      "userEmail": "muhad@demo.com",
+      "userName": "Muhad",
+      "locationId": "loc_5",
+      "locationName": "Rawalpindi Cricket Stadium",
+      "slotNumber": 112,
+      "createdAt": "2025-12-11T07:05:25.496Z",
+      "paid": true,
+      "paidAt": "2025-12-11T08:30:53.534Z"
+    },
+    {
+      "id": "booking_1765441921890",
+      "userEmail": "awais@demo.com",
+      "userName": "awais",
+      "locationId": "loc_6",
+      "locationName": "Testing",
+      "slotNumber": 2,
+      "createdAt": "2025-12-11T08:32:01.890Z",
+      "paid": true,
+      "paidAt": "2025-12-11T08:37:21.859Z"
+    },
+    {
+      "id": "booking_1765857157154",
+      "userEmail": "muhad@demo.com",
+      "userName": "Muhad",
+      "locationId": "loc_1",
+      "locationName": "Masjid Faisal",
+      "slotNumber": 28,
+      "createdAt": "2025-12-16T03:52:37.154Z",
+      "paid": false,
+      "paidAt": null
+    },
+    {
+      "id": "booking_1765858989584",
+      "userEmail": "muhad@demo.com",
+      "userName": "Muhad",
+      "locationId": "loc_6",
+      "locationName": "Testing",
+      "slotNumber": 2,
+      "createdAt": "2025-12-16T04:23:09.584Z",
+      "paid": false,
+      "paidAt": null
+    },
+    {
+      "id": "booking_1765859005330",
+      "userEmail": "muhad@demo.com",
+      "userName": "Muhad",
+      "locationId": "loc_6",
+      "locationName": "Testing",
+      "slotNumber": 3,
+      "createdAt": "2025-12-16T04:23:25.330Z",
       "paid": false,
       "paidAt": null
     }

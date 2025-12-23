@@ -6,7 +6,6 @@ import { useAuth } from "@/components/auth-context"
 import { HomeContent } from "@/components/home-content"
 import { Button } from "@/components/ui/button"
 import { ChevronLeft, ChevronRight, MapPin, CalendarClock, LogOut } from "lucide-react"
-import { DarkModeToggle } from "@/components/dark-mode-toggle"
 
 export default function HomePage() {
   const { user, isLoading, logout } = useAuth()
@@ -145,7 +144,6 @@ export default function HomePage() {
       <main className="flex-1 h-full overflow-y-auto">
         <HomeContent />
       </main>
-      <DarkModeToggle />
     </div>
   )
 }

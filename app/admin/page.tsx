@@ -6,7 +6,6 @@ import { useAuth } from "@/components/auth-context"
 import { AdminContent } from "@/components/admin-content"
 import { Button } from "@/components/ui/button"
 import { ChevronLeft, ChevronRight, MapPin, LogOut, ClipboardList } from "lucide-react"
-import { DarkModeToggle } from "@/components/dark-mode-toggle"
 
 export default function AdminPage() {
   const { user, isLoading, logout } = useAuth()
@@ -146,7 +145,6 @@ export default function AdminPage() {
       <main className="flex-1 h-full overflow-y-auto">
         <AdminContent />
       </main>
-      <DarkModeToggle />
     </div>
   )
 }

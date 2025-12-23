@@ -22,7 +22,6 @@ import {
 } from "lucide-react"
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts"
 import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from "@/components/ui/chart"
-import { DarkModeToggle } from "@/components/dark-mode-toggle"
 
 interface Booking {
   id: string
@@ -699,7 +698,6 @@ export default function BookingStatusPage() {
 
       {/* Main content */}
       <main className="flex-1 h-full overflow-y-auto">{content}</main>
-      <DarkModeToggle />
     </div>
   )
 }
