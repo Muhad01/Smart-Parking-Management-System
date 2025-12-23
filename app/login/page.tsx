@@ -1,23 +1,15 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
+import { useEffect, Suspense } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
 import { useAuth } from "@/components/auth-context"
 import { LoginForm } from "@/components/login-form"
 
-export default function LoginPage() {
+function LoginContent() {
   const { user, isLoading } = useAuth()
   const router = useRouter()
-  const [modeParam, setModeParam] = useState<"login" | "signup">("login")
-
-  useEffect(() => {
-    // Read search params from URL on client side only
-    if (typeof window !== "undefined") {
-      const params = new URLSearchParams(window.location.search)
-      const mode = params.get("mode") === "signup" ? "signup" : "login"
-      setModeParam(mode)
-    }
-  }, [])
+  const searchParams = useSearchParams()
+  const modeParam = searchParams.get("mode") === "signup" ? "signup" : "login"
 
   useEffect(() => {
     if (!isLoading && user) {
@@ -34,6 +26,20 @@ export default function LoginPage() {
   }
 
   return <LoginForm initialMode={modeParam} />
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex h-screen items-center justify-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" />
+        </div>
+      }
+    >
+      <LoginContent />
+    </Suspense>
+  )
 }
 
 
